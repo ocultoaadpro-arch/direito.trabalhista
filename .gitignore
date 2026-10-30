@@ -1,0 +1,12 @@
+# Privacidade e Dados (LGPD)
+leads.json
+
+# Arquivos compactados e builds temporários
+*.zip
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
