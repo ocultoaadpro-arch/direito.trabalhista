@@ -2269,6 +2269,208 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
+   MOBILE LUXURY PARITY SYSTEM (Garante a mesma experiência do Desktop no Celular)
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* 1. Header & Navigation */
+  .navbar-wrapper {
+    padding: 12px 16px;
+  }
+  
+  .nav-island {
+    padding: 8px 14px;
+    gap: 10px;
+  }
+
+  .nav-brand-img {
+    height: 38px;
+    max-height: 38px;
+  }
+
+  .nav-actions {
+    margin-left: auto;
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .btn-gold-outline {
+    padding: 7px 13px;
+    font-size: 0.75rem;
+    gap: 6px;
+  }
+
+  /* 2. Hero Section & Fundo Cenográfico */
+  .hero-section {
+    padding: 30px 0 60px;
+    min-height: auto;
+  }
+
+  .hero-container {
+    gap: 36px;
+  }
+
+  .hero-backdrop-img {
+    background-position: 70% center;
+    opacity: 0.48; /* Fundo de mármore e ouro bem nítido no celular */
+  }
+
+  .hero-backdrop-gradient {
+    background: linear-gradient(
+      180deg,
+      rgba(10, 10, 10, 0.72) 0%,
+      rgba(10, 10, 10, 0.45) 35%,
+      rgba(10, 10, 10, 0.85) 75%,
+      #0A0A0A 100%
+    );
+  }
+
+  .hero-headline {
+    font-size: clamp(1.85rem, 7.5vw, 2.45rem);
+    line-height: 1.18;
+    margin-bottom: 16px;
+  }
+
+  .hero-subheadline {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .hero-cta-cluster {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 28px;
+  }
+
+  .hero-cta-cluster a,
+  .hero-cta-cluster button {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+    font-size: 0.875rem;
+  }
+
+  .hero-credentials-row {
+    justify-content: space-between;
+    gap: 6px;
+    padding-top: 16px;
+  }
+
+  .cred-num {
+    font-size: 1rem;
+  }
+
+  .cred-txt {
+    font-size: 0.625rem;
+  }
+
+  /* 3. Card de Retrato da Equipe no Hero */
+  .hero-portrait-card {
+    padding: 14px;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .floating-badge {
+    padding: 7px 11px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .badge-top-right {
+    top: -10px;
+    right: 0px;
+  }
+
+  .badge-bottom-left {
+    bottom: -10px;
+    left: 0px;
+  }
+
+  .badge-icon-gold {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  .badge-icon-gold svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .badge-content strong {
+    font-size: 0.71875rem;
+  }
+
+  .badge-content span {
+    font-size: 0.59375rem;
+  }
+
+  /* 4. Grid da Equipe de Sócios */
+  .triptych-team-grid {
+    gap: 24px;
+  }
+
+  .lawyer-card {
+    padding: 20px 18px;
+  }
+
+  .lawyer-photo-frame {
+    height: 300px;
+  }
+
+  .lawyer-card-badge {
+    font-size: 0.625rem;
+    padding: 4px 10px;
+  }
+
+  /* 5. Modais & Formulários no Celular */
+  .modal-dialog {
+    padding: 28px 18px;
+    max-height: 90vh;
+    border-radius: 18px;
+  }
+
+  .modal-headline {
+    font-size: 1.45rem;
+  }
+
+  .modal-form-grid input,
+  .modal-form-grid select,
+  .modal-form-grid textarea {
+    font-size: 16px; /* Evita zoom automático no iOS Safari */
+    min-height: 46px;
+    padding: 10px 14px;
+  }
+
+  /* 6. Botão Flutuante de WhatsApp */
+  .floating-whatsapp-widget {
+    bottom: 16px;
+    right: 14px;
+  }
+
+  .whatsapp-lux-pill {
+    padding: 6px 14px 6px 8px;
+    gap: 9px;
+  }
+
+  .pill-wa-avatar-wrap,
+  .pill-wa-icon-green {
+    width: 38px;
+    height: 38px;
+  }
+
+  .pill-action-label {
+    font-size: 0.8125rem;
+  }
+
+  .pill-status-row span {
+    font-size: 0.625rem;
+  }
+}
+
+/* ==========================================================================
    Prefers Reduced Motion
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
