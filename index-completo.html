@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=980, user-scalable=yes">
+  <meta name="viewport" content="width=860, user-scalable=no, maximum-scale=1.0, minimum-scale=0.25">
   <title>Direito do Trabalho Estratégico | Alcântara &amp; Diamantino Advocacia</title>
   
   <!-- SEO & Social Meta Tags -->
@@ -52,9 +52,9 @@
   --color-gold-border-hover: rgba(230, 210, 164, 0.6);
   --color-gold-glow: rgba(198, 161, 91, 0.25);
 
-  --color-white-lux: #F5F2EB;
-  --color-silver-muted: #A3A3A3;
-  --color-dark-grey: #666666;
+  --color-white-lux: #FFFFFF;
+  --color-silver-muted: #E2DFD8;
+  --color-dark-grey: #888888;
 
   /* Typography */
   --font-serif: 'Cormorant Garamond', Georgia, serif;
@@ -98,13 +98,24 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  font-size: 17.5px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
 }
 
 body {
   min-height: 100vh;
   position: relative;
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
   background-color: var(--bg-deep-black);
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
 }
 
 a {
@@ -118,7 +129,7 @@ button, input, select, textarea {
 
 .container {
   width: 100%;
-  max-width: 980px;
+  max-width: 860px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -142,18 +153,27 @@ button, input, select, textarea {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 0;
   opacity: 0.85;
 }
 
-/* Volumetric Gold Light Rays */
-.light-ray {
+/* Volumetric Gold Light Rays Contidos em Wrapper Seguro */
+.light-rays-wrap {
   position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   pointer-events: none;
   z-index: 0;
+}
+
+.light-ray {
+  position: absolute;
+  pointer-events: none;
   border-radius: 50%;
   filter: blur(100px);
   opacity: 0.28;
@@ -301,11 +321,14 @@ button, input, select, textarea {
    ========================================================================== */
 .navbar-wrapper {
   position: sticky;
-  top: 14px;
+  top: 10px;
   z-index: 500;
   display: flex;
   justify-content: center;
-  padding: 0 20px;
+  padding: 0 16px;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
   pointer-events: none;
 }
 
@@ -313,18 +336,17 @@ button, input, select, textarea {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
-  max-width: 1180px;
-  padding: 12px 24px;
+  max-width: 860px;
+  padding: 8px 16px;
   border-radius: var(--radius-pill);
 }
 
 .obsidian-glass {
-  background: rgba(14, 14, 14, 0.82);
+  background: rgba(14, 14, 14, 0.88);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(198, 161, 91, 0.22);
+  border: 1px solid rgba(198, 161, 91, 0.25);
   box-shadow: 
     inset 0 1px 1px rgba(255, 255, 255, 0.15),
     0 12px 30px rgba(0, 0, 0, 0.75);
@@ -333,7 +355,15 @@ button, input, select, textarea {
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex-shrink: 0;
+}
+
+.nav-logo-divider {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(180deg, transparent 0%, rgba(198, 161, 91, 0.45) 50%, transparent 100%);
+  margin: 0 18px 0 14px;
+  flex-shrink: 0;
 }
 
 .logo-emblem {
@@ -371,27 +401,62 @@ button, input, select, textarea {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
+  flex-shrink: 0;
 }
 
 .nav-actions {
   display: flex;
   align-items: center;
-  margin-left: 36px;
-  padding-left: 28px;
-  border-left: 1px solid rgba(198, 161, 91, 0.22);
+  margin-left: auto;
+  padding-left: 14px;
+  flex-shrink: 0;
 }
 
 .nav-link {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-silver-muted);
+  color: #E0DDD5;
   transition: var(--transition-fast);
   white-space: nowrap;
 }
 
 .nav-link:hover {
   color: var(--color-gold-champagne);
+}
+
+.btn-gold-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #0A0A0A;
+  background: linear-gradient(135deg, #F0DFB8 0%, #C6A15B 50%, #9C7A38 100%);
+  box-shadow: 0 3px 12px rgba(198, 161, 91, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  border: none;
+  white-space: nowrap;
+  transition: var(--transition-fast);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-gold-nav svg {
+  color: #0A0A0A;
+  stroke: #0A0A0A;
+  transition: transform var(--transition-fast);
+}
+
+.btn-gold-nav:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 18px rgba(198, 161, 91, 0.55);
+}
+
+.btn-gold-nav:hover svg {
+  transform: translateX(2px);
 }
 
 .btn-gold-outline {
@@ -439,7 +504,7 @@ button, input, select, textarea {
 
 .hero-backdrop-img {
   position: absolute;
-  inset: -20px;
+  inset: 0;
   background-image: url('assets/hero-bg-luxo.jpg');
   background-size: cover;
   background-position: center right;
@@ -1080,7 +1145,7 @@ button, input, select, textarea {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 960px;
+  max-width: 860px;
   margin: 0 auto;
 }
 
@@ -1462,7 +1527,7 @@ button, input, select, textarea {
    ========================================================================== */
 .conversion-portal {
   padding: 44px 32px;
-  max-width: 880px;
+  max-width: 860px;
   margin: 0 auto;
 }
 
@@ -2225,8 +2290,10 @@ button, input, select, textarea {
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
   <!-- Feixes de Luz Dourada Animados (Volumetric Glow) -->
-  <div class="light-ray ray-1" aria-hidden="true"></div>
-  <div class="light-ray ray-2" aria-hidden="true"></div>
+  <div class="light-rays-wrap" aria-hidden="true">
+    <div class="light-ray ray-1"></div>
+    <div class="light-ray ray-2"></div>
+  </div>
 
   <!-- Barra de Progresso Dourada do Scroll -->
   <div id="scroll-progress" aria-hidden="true"></div>
@@ -2245,20 +2312,23 @@ button, input, select, textarea {
       <a href="#inicio" class="nav-logo" aria-label="Alcântara & Diamantino Consultoria Jurídica - Início">
         <img src="assets/logo.png" alt="Alcântara & Diamantino Consultoria Jurídica" class="nav-brand-img">
       </a>
+      
+      <!-- Divisor Dourado que separa o logotipo do menu -->
+      <div class="nav-logo-divider" aria-hidden="true"></div>
 
       <div class="nav-links">
         <a href="#equipe" class="nav-link">Nossa Equipe</a>
-        <a href="#temas" class="nav-link">Temas Trabalhistas</a>
-        <a href="#situacoes" class="nav-link">Situações Relevantes</a>
-        <a href="#como-funciona" class="nav-link">Como Funciona</a>
-        <a href="#radar" class="nav-link">Radar Trabalhista</a>
+        <a href="#temas" class="nav-link">Atuação</a>
+        <a href="#situacoes" class="nav-link">Situações</a>
+        <a href="#como-funciona" class="nav-link">Método</a>
+        <a href="#radar" class="nav-link">Radar</a>
         <a href="#empresas" class="nav-link">Empresas</a>
       </div>
 
       <div class="nav-actions">
-        <a href="#contato" class="btn-gold-outline" onclick="openLeadModal('Menu Superior'); return false;">
+        <a href="#contato" class="btn-gold-nav" onclick="openLeadModal('Menu Superior'); return false;">
           <span>Falar com a Equipe</span>
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
         </a>

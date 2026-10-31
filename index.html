@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=980, user-scalable=yes">
+  <meta name="viewport" content="width=860, user-scalable=no, maximum-scale=1.0, minimum-scale=0.25">
   <title>Direito do Trabalho Estratégico | Alcântara &amp; Diamantino Advocacia</title>
   
   <!-- SEO & Social Meta Tags -->
@@ -54,8 +54,10 @@
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
   <!-- Feixes de Luz Dourada Animados (Volumetric Glow) -->
-  <div class="light-ray ray-1" aria-hidden="true"></div>
-  <div class="light-ray ray-2" aria-hidden="true"></div>
+  <div class="light-rays-wrap" aria-hidden="true">
+    <div class="light-ray ray-1"></div>
+    <div class="light-ray ray-2"></div>
+  </div>
 
   <!-- Barra de Progresso Dourada do Scroll -->
   <div id="scroll-progress" aria-hidden="true"></div>
@@ -74,20 +76,23 @@
       <a href="#inicio" class="nav-logo" aria-label="Alcântara & Diamantino Consultoria Jurídica - Início">
         <img src="assets/logo.png" alt="Alcântara & Diamantino Consultoria Jurídica" class="nav-brand-img">
       </a>
+      
+      <!-- Divisor Dourado que separa o logotipo do menu -->
+      <div class="nav-logo-divider" aria-hidden="true"></div>
 
       <div class="nav-links">
         <a href="#equipe" class="nav-link">Nossa Equipe</a>
-        <a href="#temas" class="nav-link">Temas Trabalhistas</a>
-        <a href="#situacoes" class="nav-link">Situações Relevantes</a>
-        <a href="#como-funciona" class="nav-link">Como Funciona</a>
-        <a href="#radar" class="nav-link">Radar Trabalhista</a>
+        <a href="#temas" class="nav-link">Atuação</a>
+        <a href="#situacoes" class="nav-link">Situações</a>
+        <a href="#como-funciona" class="nav-link">Método</a>
+        <a href="#radar" class="nav-link">Radar</a>
         <a href="#empresas" class="nav-link">Empresas</a>
       </div>
 
       <div class="nav-actions">
-        <a href="#contato" class="btn-gold-outline" onclick="openLeadModal('Menu Superior'); return false;">
+        <a href="#contato" class="btn-gold-nav" onclick="openLeadModal('Menu Superior'); return false;">
           <span>Falar com a Equipe</span>
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
         </a>
