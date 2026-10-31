@@ -86,7 +86,7 @@ export default function Index() {
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-6 text-sm text-[#CCCCCC]">
+        <div className="flex items-center gap-6 text-sm text-[#CCCCCC]">
           <a href="#equipe" className="hover:text-[#C6A15B] transition-colors">Nossa Equipe</a>
           <a href="#temas" className="hover:text-[#C6A15B] transition-colors">Temas</a>
           <a href="#etapas" className="hover:text-[#C6A15B] transition-colors">Como Funciona</a>
