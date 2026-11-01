@@ -267,6 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initEndOfPageLeadTrigger();
   initCookieBanner();
   initModalKeyboardTrap();
+  initAutoLeadCapture();
   trackPageView();
 });
 
@@ -520,6 +521,10 @@ function openLeadModal(origem = "Botão de Contato") {
 }
 
 function closeLeadModal() {
+  // Captura o contato se a pessoa preencheu mas fechou sem clicar no WhatsApp
+  if (typeof captureModalDraftLead === "function") {
+    captureModalDraftLead(false);
+  }
   const modal = document.getElementById("lead-modal");
   if (!modal) return;
   modal.classList.remove("is-open");
@@ -694,28 +699,196 @@ function filterRadarArticles(category, btnElement) {
 }
 
 // ==========================================================================
-// ENVIO DE FORMULÁRIO E REDIRECIONAMENTO WHATSAPP COM SALVAMENTO NO CRM/ADMIN
+// CAPTURA INTELIGENTE DE LEADS (COM OU SEM CLIQUE NO WHATSAPP)
+// Salva quem clica no WhatsApp E quem apenas preenche e não clica
 // ==========================================================================
+
+let contactFormSubmitted = false;
+let modalFormSubmitted = false;
+let autoCaptureDebounceTimer = null;
+
 async function saveLeadToApiAndStorage(lead) {
+  if (!lead.id) {
+    lead.id = "lead-" + Date.now();
+  }
+  if (!lead.dataHora) {
+    const now = new Date();
+    lead.dataHora = now.toLocaleDateString("pt-BR") + " às " + now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+  }
+  if (!lead.status) {
+    lead.status = "novo";
+  }
+
+  const cleanPhone = (lead.telefone || "").replace(/\D/g, "");
+
   // 1. Salvar no backend /api/leads (leads.json)
   try {
     await fetch("/api/leads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(lead)
+      body: JSON.stringify(lead),
+      keepalive: true
     });
   } catch (err) {
-    console.log("Salvo em modo offline no localStorage");
+    console.log("Salvo no modo contingência localStorage");
   }
 
-  // 2. Salvar como contingência no localStorage
+  // 2. Salvar como contingência no localStorage com desduplicação por telefone
   try {
-    const existing = JSON.parse(localStorage.getItem("landing_advocacia_leads") || "[]");
-    existing.unshift(lead);
+    let existing = JSON.parse(localStorage.getItem("landing_advocacia_leads") || "[]");
+    const foundIndex = existing.findIndex(item => {
+      if (item.id && item.id === lead.id) return true;
+      if (cleanPhone && cleanPhone.length >= 10) {
+        const itemClean = (item.telefone || "").replace(/\D/g, "");
+        return itemClean === cleanPhone;
+      }
+      return false;
+    });
+
+    if (foundIndex >= 0) {
+      existing[foundIndex] = {
+        ...existing[foundIndex],
+        ...lead,
+        id: existing[foundIndex].id || lead.id
+      };
+      // Move para o topo
+      const updated = existing.splice(foundIndex, 1)[0];
+      existing.unshift(updated);
+    } else {
+      existing.unshift(lead);
+    }
     localStorage.setItem("landing_advocacia_leads", JSON.stringify(existing));
   } catch (e) {
     console.error("Erro localStorage:", e);
   }
+}
+
+function captureContactFormDraft(isSubmittingWhatsApp = false) {
+  if (contactFormSubmitted && !isSubmittingWhatsApp) return;
+
+  const nomeInput = document.getElementById("form-nome");
+  const telInput = document.getElementById("form-tel");
+  const assuntoInput = document.getElementById("form-assunto");
+  const descInput = document.getElementById("form-desc");
+
+  if (!telInput) return;
+  const rawDigits = telInput.value.replace(/\D/g, "");
+  if (rawDigits.length < 10) return;
+
+  const nome = (nomeInput ? nomeInput.value.trim() : "") || "Cliente em Preenchimento";
+  const telefone = telInput.value.trim();
+  const assunto = (assuntoInput ? assuntoInput.value : "Dúvida Geral sobre Contrato de Trabalho");
+  const descricao = descInput ? descInput.value.trim() : "";
+
+  const origem = isSubmittingWhatsApp 
+    ? "Formulário da Página (Enviou para WhatsApp)" 
+    : "Formulário da Página (Preencheu formulário • Não clicou no WhatsApp)";
+
+  const now = new Date();
+  const leadData = {
+    nome,
+    telefone,
+    assunto,
+    descricao,
+    origem,
+    status: "novo",
+    dataHora: now.toLocaleDateString("pt-BR") + " às " + now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })
+  };
+
+  saveLeadToApiAndStorage(leadData);
+}
+
+function captureModalDraftLead(isSubmittingWhatsApp = false) {
+  if (modalFormSubmitted && !isSubmittingWhatsApp) return;
+
+  const nomeInput = document.getElementById("scroll-nome") || document.getElementById("lead-modal-nome");
+  const telInput = document.getElementById("scroll-tel") || document.getElementById("lead-modal-tel");
+  const assuntoInput = document.getElementById("scroll-assunto") || document.getElementById("lead-modal-assunto");
+
+  if (!telInput) return;
+  const rawDigits = telInput.value.replace(/\D/g, "");
+  if (rawDigits.length < 10) return;
+
+  const nome = (nomeInput ? nomeInput.value.trim() : "") || "Cliente em Preenchimento";
+  const telefone = telInput.value.trim();
+  const assunto = (assuntoInput ? assuntoInput.value : "Dúvida Geral sobre Contrato de Trabalho");
+
+  const origem = isSubmittingWhatsApp
+    ? `Página de Direito do Trabalho (${currentLeadOrigin} • Enviou para WhatsApp)`
+    : `Página de Direito do Trabalho (${currentLeadOrigin} • Preencheu e não clicou no WhatsApp)`;
+
+  const now = new Date();
+  const leadData = {
+    nome,
+    telefone,
+    assunto,
+    origem,
+    status: "novo",
+    dataHora: now.toLocaleDateString("pt-BR") + " às " + now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })
+  };
+
+  saveLeadToApiAndStorage(leadData);
+}
+
+function initAutoLeadCapture() {
+  const formTel = document.getElementById("form-tel");
+  const formNome = document.getElementById("form-nome");
+  const formAssunto = document.getElementById("form-assunto");
+  const scrollTel = document.getElementById("scroll-tel");
+  const scrollNome = document.getElementById("scroll-nome");
+  const scrollAssunto = document.getElementById("scroll-assunto");
+
+  // Captura no formulário principal ao digitar ou sair do campo
+  if (formTel) {
+    formTel.addEventListener("blur", () => captureContactFormDraft(false));
+    formTel.addEventListener("input", (e) => {
+      const digits = e.target.value.replace(/\D/g, "");
+      if (digits.length >= 10) {
+        clearTimeout(autoCaptureDebounceTimer);
+        autoCaptureDebounceTimer = setTimeout(() => {
+          captureContactFormDraft(false);
+        }, 900);
+      }
+    });
+  }
+  if (formNome) {
+    formNome.addEventListener("blur", () => captureContactFormDraft(false));
+  }
+  if (formAssunto) {
+    formAssunto.addEventListener("change", () => captureContactFormDraft(false));
+  }
+
+  // Captura no modal rápido ao digitar ou sair do campo
+  if (scrollTel) {
+    scrollTel.addEventListener("blur", () => captureModalDraftLead(false));
+    scrollTel.addEventListener("input", (e) => {
+      const digits = e.target.value.replace(/\D/g, "");
+      if (digits.length >= 10) {
+        clearTimeout(autoCaptureDebounceTimer);
+        autoCaptureDebounceTimer = setTimeout(() => {
+          captureModalDraftLead(false);
+        }, 900);
+      }
+    });
+  }
+  if (scrollNome) {
+    scrollNome.addEventListener("blur", () => captureModalDraftLead(false));
+  }
+  if (scrollAssunto) {
+    scrollAssunto.addEventListener("change", () => captureModalDraftLead(false));
+  }
+
+  // Captura caso o usuário tente fechar a aba ou mudar de aplicativo
+  window.addEventListener("beforeunload", () => {
+    captureContactFormDraft(false);
+    captureModalDraftLead(false);
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      captureContactFormDraft(false);
+      captureModalDraftLead(false);
+    }
+  });
 }
 
 async function handleContactSubmit(event) {
@@ -732,19 +905,8 @@ async function handleContactSubmit(event) {
     return;
   }
 
-  const now = new Date();
-  const leadData = {
-    nome: nome,
-    telefone: telefone,
-    assunto: assunto,
-    descricao: descricao,
-    origem: "Formulário da Página",
-    status: "novo",
-    dataHora: now.toLocaleDateString("pt-BR") + " às " + now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })
-  };
-
-  // Salvar no painel do administrador em background
-  saveLeadToApiAndStorage(leadData);
+  contactFormSubmitted = true;
+  captureContactFormDraft(true);
 
   let mensagem = `*Solicitação de Análise Jurídica - Direito do Trabalho*\n\n`;
   mensagem += `👤 *Nome:* ${nome}\n`;
@@ -777,7 +939,7 @@ async function handleContactSubmit(event) {
         </svg>
       `;
     }
-  }, 400);
+  }, 350);
 }
 
 async function handleExitFormSubmit(event) {
@@ -793,17 +955,14 @@ async function handleExitFormSubmit(event) {
     nome: nome,
     telefone: telefone,
     assunto: assunto,
-    origem: "Pop-up de Retenção",
+    origem: "Pop-up de Retenção (Enviou para WhatsApp)",
     status: "novo",
     dataHora: now.toLocaleDateString("pt-BR") + " às " + now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })
   };
 
-  // Salva no CRM / leads.json
   saveLeadToApiAndStorage(leadData);
-
   closeExitModal();
 
-  // Abrir WhatsApp qualificando o lead com o problema selecionado
   let mensagem = `*Solicitação de Avaliação Jurídica - Direito do Trabalho*\n\n`;
   mensagem += `Olá! Me chamo *${nome}*.\n\n`;
   mensagem += `📱 *Meu WhatsApp:* ${telefone}\n`;
@@ -827,22 +986,11 @@ async function handleScrollLeadSubmit(event) {
 
   if (!nome || !telefone) return;
 
-  const now = new Date();
-  const leadData = {
-    nome: nome,
-    telefone: telefone,
-    assunto: assunto,
-    origem: `Página de Direito do Trabalho (${currentLeadOrigin})`,
-    status: "novo",
-    dataHora: now.toLocaleDateString("pt-BR") + " às " + now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })
-  };
-
-  // Salva no CRM / leads.json e localStorage imediatamente
-  saveLeadToApiAndStorage(leadData);
+  modalFormSubmitted = true;
+  captureModalDraftLead(true);
 
   closeLeadModal();
 
-  // Redireciona para o WhatsApp qualificando o lead com o problema selecionado
   let mensagem = `*Solicitação de Avaliação Jurídica - Direito do Trabalho*\n\n`;
   mensagem += `Olá! Me chamo *${nome}*.\n\n`;
   mensagem += `📱 *Meu WhatsApp:* ${telefone}\n`;

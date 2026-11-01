@@ -116,20 +116,42 @@ class CustomHandler(BaseHTTPRequestHandler):
                 leads = get_leads()
 
                 # Atribuir ID e Data/Hora
-                new_lead["id"] = f"lead-{int(datetime.now().timestamp() * 1000)}"
+                lead_id = new_lead.get("id") or f"lead-{int(datetime.now().timestamp() * 1000)}"
+                new_lead["id"] = lead_id
                 if "dataHora" not in new_lead or not new_lead["dataHora"]:
                     new_lead["dataHora"] = datetime.now().strftime("%d/%m/%Y às %H:%M")
                 if "status" not in new_lead:
                     new_lead["status"] = "novo"
 
-                # Inserir no topo da lista (mais recentes primeiro)
-                leads.insert(0, new_lead)
+                # Limpar telefone para verificação de duplicidade
+                clean_phone = "".join(filter(str.isdigit, new_lead.get("telefone", "")))
+
+                found_idx = -1
+                for idx, existing in enumerate(leads):
+                    if existing.get("id") == lead_id:
+                        found_idx = idx
+                        break
+                    if clean_phone and len(clean_phone) >= 10:
+                        existing_clean = "".join(filter(str.isdigit, existing.get("telefone", "")))
+                        if existing_clean == clean_phone:
+                            found_idx = idx
+                            break
+
+                if found_idx >= 0:
+                    leads[found_idx].update(new_lead)
+                    # Move para o topo da lista
+                    saved_lead = leads.pop(found_idx)
+                    leads.insert(0, saved_lead)
+                else:
+                    leads.insert(0, new_lead)
+                    saved_lead = new_lead
+
                 save_leads(leads)
 
                 self.send_response(201)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": True, "lead": new_lead}, ensure_ascii=False).encode("utf-8"))
+                self.wfile.write(json.dumps({"success": True, "lead": saved_lead}, ensure_ascii=False).encode("utf-8"))
             except Exception as e:
                 self.send_response(400)
                 self.send_header("Content-Type", "application/json")
