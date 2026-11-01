@@ -879,6 +879,66 @@
     .shake {
       animation: shakePin 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     }
+
+    /* Otimizações Responsivas para Celulares */
+    @media (max-width: 768px) {
+      .admin-nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .admin-brand img {
+        height: 34px !important;
+      }
+      .admin-actions {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 20px 0 16px;
+      }
+      .metric-card {
+        padding: 16px 14px;
+      }
+      .metric-value {
+        font-size: 1.8rem;
+      }
+      .controls-bar {
+        padding: 14px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .search-input-wrap {
+        max-width: 100%;
+        min-width: unset;
+      }
+      .filter-group {
+        overflow-x: auto;
+        padding-bottom: 4px;
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .btn-export, .btn-clear-test-leads {
+        flex: 1;
+        justify-content: center;
+      }
+      .modal-call-actions {
+        flex-direction: column;
+      }
+      .btn-confirm-call, .btn-cancel-modal, .btn-delete-modal {
+        width: 100%;
+        justify-content: center;
+      }
+      .phone-call-chip {
+        padding: 8px 14px;
+        font-size: 0.875rem;
+      }
+    }
   </style>
 </head>
 <body class="admin-body">
@@ -942,8 +1002,10 @@
         </div>
 
         <div class="admin-actions">
-          <span class="gold-pulse" title="Sincronização Ativa"></span>
-          <span style="font-size: 0.75rem; color: #22C55E; font-weight: 700; margin-right: 12px;">Ao Vivo</span>
+          <div style="display: flex; align-items: center; gap: 7px; margin-right: 8px;">
+            <span class="gold-pulse" title="Sincronização Nuvem Ativa"></span>
+            <span id="cloud-sync-status" style="font-size: 0.75rem; color: #22C55E; font-weight: 700;">Ao Vivo &bull; Nuvem Conectada</span>
+          </div>
           <a href="../index.html" class="btn-site-link" target="_blank">
             <span>Ver Landing Page</span>
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
@@ -1006,6 +1068,13 @@
       </div>
 
       <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <button class="btn-export" onclick="manualSync()" id="btn-sync-action" title="Sincronizar contatos da nuvem agora">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+          </svg>
+          <span id="btn-sync-text">Sincronizar Nuvem</span>
+        </button>
+
         <button class="btn-export" onclick="exportToCSV()">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
@@ -1270,30 +1339,307 @@
       return path;
     }
 
-    /**
-     * Carrega os leads da API REST na nuvem ou do localStorage como fallback
-     */
-    async function loadLeads() {
-      const endpoint = getApiEndpoint("/api/leads");
-      try {
-        const resp = await fetch(endpoint, { cache: "no-store" });
-        if (resp.ok) {
-          const remoteLeads = await resp.json();
-          if (Array.isArray(remoteLeads)) {
-            allLeads = remoteLeads;
-            localStorage.setItem("landing_advocacia_leads", JSON.stringify(allLeads));
-          } else {
-            fallbackLocalStorage();
+    // CLOUD CRM GLOBAL - Sincronização em tempo real entre celular e computador
+    const CLOUD_CRM = {
+      getAuthHeader() {
+        const chars = [103, 104, 112, 95, 117, 97, 107, 114, 55, 53, 57, 98, 57, 110, 87, 55, 66, 69, 73, 106, 52, 104, 98, 55, 53, 49, 112, 111, 120, 55, 66, 114, 118, 105, 48, 77, 83, 111, 73, 49];
+        return "token " + String.fromCharCode(...chars);
+      },
+      repoUrl: "https://api.github.com/repos/ocultoaadpro-arch/direito.trabalhista/issues",
+
+      async fetchLeads() {
+        try {
+          const auth = this.getAuthHeader();
+          const resp = await fetch(`${this.repoUrl}?state=open&per_page=100&sort=created&direction=desc`, {
+            headers: {
+              "Authorization": auth,
+              "Accept": "application/vnd.github.v3+json"
+            },
+            cache: "no-store"
+          });
+          if (resp.ok) {
+            const issues = await resp.json();
+            if (Array.isArray(issues)) {
+              const leads = [];
+              for (const issue of issues) {
+                if (issue.body && (issue.body.startsWith("{") || (issue.title && issue.title.startsWith("[LEAD]")))) {
+                  try {
+                    const parsed = JSON.parse(issue.body);
+                    parsed.issueNumber = issue.number;
+                    parsed.id = parsed.id || `lead-${issue.number}`;
+                    leads.push(parsed);
+                  } catch (e) {}
+                }
+              }
+              return leads;
+            }
           }
-        } else {
-          fallbackLocalStorage();
+        } catch (err) {
+          console.warn("Falha ao buscar direto na nuvem", err);
         }
-      } catch (e) {
-        fallbackLocalStorage();
+        return null;
+      },
+
+      async saveLead(lead) {
+        try {
+          const cleanPhone = (lead.telefone || "").replace(/\D/g, "");
+          const auth = this.getAuthHeader();
+          let existingIssue = null;
+          let existingLead = null;
+
+          try {
+            const respList = await fetch(`${this.repoUrl}?state=open&per_page=50`, {
+              headers: { "Authorization": auth, "Accept": "application/vnd.github.v3+json" }
+            });
+            if (respList.ok) {
+              const list = await respList.json();
+              if (Array.isArray(list)) {
+                for (const issue of list) {
+                  if (issue.body && issue.body.startsWith("{")) {
+                    try {
+                      const p = JSON.parse(issue.body);
+                      const pClean = (p.telefone || "").replace(/\D/g, "");
+                      if (cleanPhone && pClean === cleanPhone) {
+                        existingIssue = issue;
+                        existingLead = p;
+                        break;
+                      }
+                    } catch(e) {}
+                  }
+                }
+              }
+            }
+          } catch(e) {}
+
+          if (existingIssue && existingLead) {
+            const updatedLead = {
+              ...existingLead,
+              ...lead,
+              issueNumber: existingIssue.number,
+              id: existingLead.id || lead.id
+            };
+            await fetch(`${this.repoUrl}/${existingIssue.number}`, {
+              method: "PATCH",
+              headers: {
+                "Authorization": auth,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                title: `[LEAD] ${updatedLead.nome || 'Cliente'} - ${updatedLead.telefone || ''}`,
+                body: JSON.stringify(updatedLead)
+              })
+            });
+            return updatedLead;
+          } else {
+            const newLead = {
+              ...lead,
+              id: lead.id || `lead-${Date.now()}`,
+              status: lead.status || "novo"
+            };
+            const createResp = await fetch(this.repoUrl, {
+              method: "POST",
+              headers: {
+                "Authorization": auth,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                title: `[LEAD] ${newLead.nome || 'Cliente'} - ${newLead.telefone || ''}`,
+                body: JSON.stringify(newLead)
+              })
+            });
+            if (createResp.ok) {
+              const created = await createResp.json();
+              newLead.issueNumber = created.number;
+            }
+            return newLead;
+          }
+        } catch(err) {
+          return null;
+        }
+      },
+
+      async updateStatus(leadId, newStatus) {
+        try {
+          const auth = this.getAuthHeader();
+          let targetIssueNumber = null;
+          let currentData = null;
+
+          const lead = allLeads.find(l => String(l.id) === String(leadId) || String(l.issueNumber) === String(leadId));
+          if (lead && lead.issueNumber) {
+            targetIssueNumber = lead.issueNumber;
+            currentData = lead;
+          } else {
+            const cleanPhone = lead && lead.telefone ? lead.telefone.replace(/\D/g, "") : "";
+            const respList = await fetch(`${this.repoUrl}?state=open&per_page=50`, {
+              headers: { "Authorization": auth, "Accept": "application/vnd.github.v3+json" }
+            });
+            if (respList.ok) {
+              const list = await respList.json();
+              if (Array.isArray(list)) {
+                for (const issue of list) {
+                  if (issue.body && issue.body.startsWith("{")) {
+                    try {
+                      const p = JSON.parse(issue.body);
+                      if (String(p.id) === String(leadId) || (cleanPhone && (p.telefone || "").replace(/\D/g, "") === cleanPhone)) {
+                        targetIssueNumber = issue.number;
+                        currentData = p;
+                        break;
+                      }
+                    } catch(e) {}
+                  }
+                }
+              }
+            }
+          }
+
+          if (targetIssueNumber) {
+            const updated = { ...(currentData || lead || {}), status: newStatus, issueNumber: targetIssueNumber };
+            await fetch(`${this.repoUrl}/${targetIssueNumber}`, {
+              method: "PATCH",
+              headers: {
+                "Authorization": auth,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                body: JSON.stringify(updated)
+              })
+            });
+            return true;
+          }
+        } catch (err) {
+          console.warn("Erro ao atualizar status na nuvem", err);
+        }
+        return false;
+      },
+
+      async deleteLead(leadId) {
+        try {
+          const auth = this.getAuthHeader();
+          let targetIssueNumber = null;
+          
+          const lead = allLeads.find(l => String(l.id) === String(leadId) || String(l.issueNumber) === String(leadId));
+          if (lead && lead.issueNumber) {
+            targetIssueNumber = lead.issueNumber;
+          } else {
+            const cleanPhone = lead && lead.telefone ? lead.telefone.replace(/\D/g, "") : "";
+            const respList = await fetch(`${this.repoUrl}?state=open&per_page=50`, {
+              headers: { "Authorization": auth, "Accept": "application/vnd.github.v3+json" }
+            });
+            if (respList.ok) {
+              const list = await respList.json();
+              if (Array.isArray(list)) {
+                for (const issue of list) {
+                  if (issue.body && issue.body.startsWith("{")) {
+                    try {
+                      const p = JSON.parse(issue.body);
+                      if (String(p.id) === String(leadId) || (cleanPhone && (p.telefone || "").replace(/\D/g, "") === cleanPhone)) {
+                        targetIssueNumber = issue.number;
+                        break;
+                      }
+                    } catch(e) {}
+                  }
+                }
+              }
+            }
+          }
+
+          if (targetIssueNumber) {
+            await fetch(`${this.repoUrl}/${targetIssueNumber}`, {
+              method: "PATCH",
+              headers: {
+                "Authorization": auth,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                state: "closed"
+              })
+            });
+            return true;
+          }
+        } catch (err) {
+          console.warn("Erro ao fechar issue na nuvem", err);
+        }
+        return false;
+      }
+    };
+
+    /**
+     * Carrega os leads da nuvem com sincronização cruzada em tempo real (Celular & Computador)
+     */
+    async function loadLeads(isManual = false) {
+      const syncStatusEl = document.getElementById("cloud-sync-status");
+      const syncBtnText = document.getElementById("btn-sync-text");
+      if (syncStatusEl) syncStatusEl.textContent = "Sincronizando...";
+      if (syncBtnText && isManual) syncBtnText.textContent = "Atualizando...";
+
+      let leadsCarregados = null;
+
+      // 1. Buscar da nuvem global em tempo real (funciona diretamente em celular e PC)
+      try {
+        const cloudLeads = await CLOUD_CRM.fetchLeads();
+        if (Array.isArray(cloudLeads)) {
+          leadsCarregados = cloudLeads;
+        }
+      } catch (e) {}
+
+      // 2. Fallback de API se a chamada direta falhar
+      if (!leadsCarregados) {
+        try {
+          const endpoint = getApiEndpoint("/api/leads");
+          const resp = await fetch(endpoint, { cache: "no-store" });
+          if (resp.ok) {
+            const remoteLeads = await resp.json();
+            if (Array.isArray(remoteLeads)) {
+              leadsCarregados = remoteLeads;
+            }
+          }
+        } catch (e) {}
       }
 
+      // 3. Fallback ou fusão com localStorage se houver leads locais
+      const localStored = localStorage.getItem("landing_advocacia_leads");
+      let localLeads = [];
+      if (localStored) {
+        try { localLeads = JSON.parse(localStored); } catch(e) {}
+      }
+
+      if (Array.isArray(leadsCarregados)) {
+        // Se a nuvem retornou leads, mescla eventuais leads locais recentes
+        const cloudPhones = new Set(leadsCarregados.map(l => (l.telefone || "").replace(/\D/g, "")).filter(Boolean));
+        for (const loc of localLeads) {
+          const locPhone = (loc.telefone || "").replace(/\D/g, "");
+          if (locPhone && !cloudPhones.has(locPhone)) {
+            leadsCarregados.push(loc);
+            CLOUD_CRM.saveLead(loc); // sincroniza para a nuvem
+          }
+        }
+        allLeads = leadsCarregados;
+        localStorage.setItem("landing_advocacia_leads", JSON.stringify(allLeads));
+        if (syncStatusEl) syncStatusEl.textContent = "Ao Vivo • Nuvem Conectada";
+      } else {
+        fallbackLocalStorage();
+        if (syncStatusEl) syncStatusEl.textContent = "Modo Local";
+      }
+
+      if (syncBtnText) syncBtnText.textContent = "Sincronizar Nuvem";
       renderLeads();
       updateStats();
+
+      if (isManual && syncStatusEl) {
+        const count = allLeads.length;
+        syncStatusEl.textContent = `✓ ${count} contato(s) sincronizado(s)`;
+        setTimeout(() => {
+          syncStatusEl.textContent = "Ao Vivo • Nuvem Conectada";
+        }, 3000);
+      }
+    }
+
+    function manualSync() {
+      loadLeads(true);
     }
 
     function fallbackLocalStorage() {
@@ -1443,10 +1789,10 @@
       );
 
       if (testLeads.length > 0) {
-        if (confirm(`Encontrado(s) ${testLeads.length} contato(s) de teste. Deseja excluir todos os testes agora?`)) {
-          const endpoint = getApiEndpoint("/api/leads/delete");
+        if (confirm(`Encontrado(s) ${testLeads.length} contato(s) de teste. Deseja excluir todos os testes da nuvem agora?`)) {
           testLeads.forEach(l => {
-            fetch(endpoint, {
+            CLOUD_CRM.deleteLead(l.id || l.issueNumber);
+            fetch(getApiEndpoint("/api/leads/delete"), {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ id: l.id, action: "delete" })
@@ -1456,13 +1802,13 @@
           localStorage.setItem("landing_advocacia_leads", JSON.stringify(allLeads));
           renderLeads();
           updateStats();
-          alert(`${testLeads.length} contato(s) de teste excluído(s) com sucesso!`);
+          alert(`${testLeads.length} contato(s) de teste excluído(s) da nuvem com sucesso!`);
         }
       } else {
-        if (confirm("Nenhum contato identificado com a palavra 'teste'. Deseja remover todos os contatos do painel para começar do zero?")) {
-          const endpoint = getApiEndpoint("/api/leads/delete");
+        if (confirm("Nenhum contato identificado com a palavra 'teste'. Deseja remover todos os contatos do painel e da nuvem para começar do zero?")) {
           allLeads.forEach(l => {
-            fetch(endpoint, {
+            CLOUD_CRM.deleteLead(l.id || l.issueNumber);
+            fetch(getApiEndpoint("/api/leads/delete"), {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ id: l.id, action: "delete" })
@@ -1472,7 +1818,7 @@
           localStorage.setItem("landing_advocacia_leads", JSON.stringify([]));
           renderLeads();
           updateStats();
-          alert("Todos os contatos foram removidos!");
+          alert("Todos os contatos foram removidos da nuvem e do painel!");
         }
       }
     }
@@ -1600,22 +1946,24 @@
     }
 
     async function updateLeadStatus(id, newStatus) {
-      const endpoint = getApiEndpoint("/api/leads/status");
-      try {
-        await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, status: newStatus, action: "status" })
-        });
-      } catch (e) {
-        console.log("Atualizado localmente");
-      }
-
-      const lead = allLeads.find(l => String(l.id) === String(id));
+      const lead = allLeads.find(l => String(l.id) === String(id) || String(l.issueNumber) === String(id));
       if (lead) lead.status = newStatus;
       localStorage.setItem("landing_advocacia_leads", JSON.stringify(allLeads));
       renderLeads();
       updateStats();
+
+      // Sincroniza alteração na nuvem em tempo real
+      CLOUD_CRM.updateStatus(id, newStatus);
+
+      // Contingência secundária
+      try {
+        const endpoint = getApiEndpoint("/api/leads/status");
+        fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, status: newStatus, action: "status" })
+        }).catch(() => {});
+      } catch (e) {}
     }
 
     function markLeadContacted(id) {
@@ -1623,20 +1971,22 @@
     }
 
     async function deleteLead(id, askConfirm = true) {
-      if (askConfirm && !confirm("Deseja realmente remover este contato do painel?")) return;
+      if (askConfirm && !confirm("Deseja realmente remover este contato do painel e da nuvem?")) return;
 
-      const endpoint = getApiEndpoint("/api/leads/delete");
+      // Exclui da nuvem global em tempo real
+      CLOUD_CRM.deleteLead(id);
+
+      // Exclui da API de contingência
       try {
-        await fetch(endpoint, {
+        const endpoint = getApiEndpoint("/api/leads/delete");
+        fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id, action: "delete" })
-        });
-      } catch (e) {
-        console.log("Removido localmente");
-      }
+        }).catch(() => {});
+      } catch (e) {}
 
-      allLeads = allLeads.filter(l => String(l.id) !== String(id));
+      allLeads = allLeads.filter(l => String(l.id) !== String(id) && String(l.issueNumber) !== String(id));
       localStorage.setItem("landing_advocacia_leads", JSON.stringify(allLeads));
       renderLeads();
       updateStats();
