@@ -671,30 +671,293 @@
       color: #FFFFFF;
       box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
     }
+
+    /* Estilos do Acesso / Tela de Bloqueio (PIN 2014) */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: radial-gradient(circle at 50% 25%, #1C1812 0%, #060606 80%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+
+    .auth-card {
+      background: #0E0E0E;
+      border: 1px solid rgba(198, 161, 91, 0.35);
+      border-radius: 24px;
+      max-width: 380px;
+      width: 100%;
+      padding: 36px 26px 28px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(198, 161, 91, 0.15);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeInAuth 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeInAuth {
+      from { opacity: 0; transform: scale(0.94); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .auth-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      margin-bottom: 16px;
+    }
+
+    .auth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(198, 161, 91, 0.12);
+      border: 1px solid rgba(198, 161, 91, 0.35);
+      color: #E6D2A4;
+      font-size: 0.6875rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    .auth-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .auth-subtitle {
+      font-size: 0.8125rem;
+      color: #A3A3A3;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      min-height: 24px;
+      align-items: center;
+    }
+
+    .pin-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(198, 161, 91, 0.4);
+      background: transparent;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .pin-dot.filled {
+      background: linear-gradient(135deg, #F5E6C8 0%, #C6A15B 100%);
+      border-color: #E6D2A4;
+      box-shadow: 0 0 14px rgba(198, 161, 91, 0.8);
+      transform: scale(1.15);
+    }
+
+    .pin-dot.error {
+      background: #EF4444;
+      border-color: #EF4444;
+      box-shadow: 0 0 14px rgba(239, 68, 68, 0.8);
+    }
+
+    .pin-dot.success {
+      background: #22C55E;
+      border-color: #22C55E;
+      box-shadow: 0 0 14px rgba(34, 197, 94, 0.8);
+    }
+
+    .pin-feedback {
+      min-height: 20px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #EF4444;
+      margin-bottom: 18px;
+      transition: all 0.2s;
+    }
+
+    .pin-feedback.success-msg {
+      color: #22C55E;
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 290px;
+      margin: 0 auto 14px;
+    }
+
+    .key-btn {
+      height: 58px;
+      background: #141414;
+      border: 1px solid rgba(198, 161, 91, 0.22);
+      border-radius: 16px;
+      color: #F5F2EB;
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      font-family: inherit;
+    }
+
+    .key-btn:hover {
+      background: rgba(198, 161, 91, 0.15);
+      border-color: #C6A15B;
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
+    .key-btn:active {
+      transform: scale(0.92);
+      background: #C6A15B;
+      color: #080808;
+    }
+
+    .key-action {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #A3A3A3;
+      background: #101010;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .key-action:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #EF4444;
+    }
+
+    .btn-lock-screen {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(198, 161, 91, 0.3);
+      color: #E6D2A4;
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      font-family: inherit;
+    }
+
+    .btn-lock-screen:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: #EF4444;
+      color: #EF4444;
+    }
+
+    @keyframes shakePin {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .shake {
+      animation: shakePin 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
   </style>
 </head>
 <body class="admin-body">
 
-  <!-- Top Header -->
-  <header class="admin-header">
-    <div class="container admin-nav-container">
-      <div class="admin-brand">
-        <a href="index.html" style="display: flex; align-items: center; text-decoration: none;">
-          <img src="assets/logo.png" alt="Alcântara & Diamantino Consultoria Jurídica" style="height: 42px; width: auto; object-fit: contain;">
-        </a>
-        <span class="admin-badge">CRM &bull; PAINEL DE LEADS</span>
+  <!-- Tela de Bloqueio com Teclado Numérico (Senha: 2014) -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-card">
+      <img src="assets/logo.png" onerror="this.src='../assets/logo.png'" alt="Alcântara & Diamantino Advocacia" class="auth-logo">
+      <span class="auth-badge">CRM &bull; ACESSO RESTRITO</span>
+      <h1 class="auth-title">Painel Administrativo</h1>
+      <p class="auth-subtitle">Selecione os números abaixo para inserir sua senha de acesso</p>
+
+      <div class="pin-dots" id="pin-dots">
+        <span class="pin-dot" id="dot-0"></span>
+        <span class="pin-dot" id="dot-1"></span>
+        <span class="pin-dot" id="dot-2"></span>
+        <span class="pin-dot" id="dot-3"></span>
       </div>
 
-      <div class="admin-actions">
-        <span class="gold-pulse" title="Sincronização Ativa"></span>
-        <span style="font-size: 0.75rem; color: #22C55E; font-weight: 700; margin-right: 12px;">Ao Vivo</span>
-        <a href="index.html" class="btn-site-link" target="_blank">
-          <span>Ver Landing Page</span>
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
-        </a>
+      <div class="pin-feedback" id="pin-feedback"></div>
+
+      <!-- Teclado Numérico na tela para não abrir o teclado do celular -->
+      <div class="keypad-grid">
+        <button type="button" class="key-btn" onclick="pressDigit('1')">1</button>
+        <button type="button" class="key-btn" onclick="pressDigit('2')">2</button>
+        <button type="button" class="key-btn" onclick="pressDigit('3')">3</button>
+        <button type="button" class="key-btn" onclick="pressDigit('4')">4</button>
+        <button type="button" class="key-btn" onclick="pressDigit('5')">5</button>
+        <button type="button" class="key-btn" onclick="pressDigit('6')">6</button>
+        <button type="button" class="key-btn" onclick="pressDigit('7')">7</button>
+        <button type="button" class="key-btn" onclick="pressDigit('8')">8</button>
+        <button type="button" class="key-btn" onclick="pressDigit('9')">9</button>
+        <button type="button" class="key-btn key-action" onclick="clearPin()" title="Limpar dígitos digitados">
+          <span>Limpar</span>
+        </button>
+        <button type="button" class="key-btn" onclick="pressDigit('0')">0</button>
+        <button type="button" class="key-btn key-action" onclick="backspacePin()" title="Apagar último dígito">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+            <line x1="18" y1="9" x2="12" y2="15"></line>
+            <line x1="12" y1="9" x2="18" y2="15"></line>
+          </svg>
+        </button>
       </div>
+
+      <p style="font-size: 0.6875rem; color: #666666; margin-top: 10px;">
+        🔒 Sistema protegido &bull; Alcântara &amp; Diamantino Advocacia
+      </p>
     </div>
-  </header>
+  </div>
+
+  <div id="admin-crm-content" style="display: none;">
+    <!-- Top Header -->
+    <header class="admin-header">
+      <div class="container admin-nav-container">
+        <div class="admin-brand">
+          <a href="index.html" style="display: flex; align-items: center; text-decoration: none;">
+            <img src="assets/logo.png" onerror="this.src='../assets/logo.png'" alt="Alcântara & Diamantino Consultoria Jurídica" style="height: 42px; width: auto; object-fit: contain;">
+          </a>
+          <span class="admin-badge">CRM &bull; PAINEL DE LEADS</span>
+        </div>
+
+        <div class="admin-actions">
+          <span class="gold-pulse" title="Sincronização Ativa"></span>
+          <span style="font-size: 0.75rem; color: #22C55E; font-weight: 700; margin-right: 12px;">Ao Vivo</span>
+          <a href="index.html" class="btn-site-link" target="_blank">
+            <span>Ver Landing Page</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+          <button type="button" class="btn-lock-screen" onclick="lockAdmin()" title="Bloquear e Sair do Painel">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Sair</span>
+          </button>
+        </div>
+      </div>
+    </header>
 
   <main class="container">
     
@@ -851,16 +1114,147 @@
     </div>
 
   </main>
+  </div> <!-- Fim #admin-crm-content -->
 
   <script>
+    const CORRECT_PIN = "2014";
+    let enteredPin = "";
+    let isUnlocked = false;
     let allLeads = [];
     let currentFilter = 'todos';
     let currentModalLead = null;
 
     document.addEventListener("DOMContentLoaded", () => {
-      loadLeads();
-      // Auto-refresh a cada 8 segundos para sincronizar contatos em tempo real
-      setInterval(loadLeads, 8000);
+      checkExistingAuth();
+      // Auto-refresh a cada 8 segundos para sincronizar contatos em tempo real (apenas se desbloqueado)
+      setInterval(() => {
+        if (isUnlocked) loadLeads();
+      }, 8000);
+    });
+
+    function checkExistingAuth() {
+      const savedAuth = sessionStorage.getItem("ad_crm_auth");
+      if (savedAuth === "2014_verified") {
+        unlockDashboard(false);
+      } else {
+        document.getElementById("auth-overlay").style.display = "flex";
+        document.getElementById("admin-crm-content").style.display = "none";
+      }
+    }
+
+    function updateDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (!dot) continue;
+        dot.className = "pin-dot" + (i < enteredPin.length ? " filled" : "");
+      }
+      const feedback = document.getElementById("pin-feedback");
+      if (feedback) {
+        feedback.textContent = "";
+        feedback.className = "pin-feedback";
+      }
+    }
+
+    function pressDigit(digit) {
+      if (enteredPin.length >= 4) return;
+      enteredPin += String(digit);
+      updateDots();
+
+      if (enteredPin.length === 4) {
+        verifyPin();
+      }
+    }
+
+    function backspacePin() {
+      if (enteredPin.length > 0) {
+        enteredPin = enteredPin.slice(0, -1);
+        updateDots();
+      }
+    }
+
+    function clearPin() {
+      enteredPin = "";
+      updateDots();
+    }
+
+    function verifyPin() {
+      if (enteredPin === CORRECT_PIN) {
+        for (let i = 0; i < 4; i++) {
+          const dot = document.getElementById(`dot-${i}`);
+          if (dot) dot.className = "pin-dot success";
+        }
+        const feedback = document.getElementById("pin-feedback");
+        feedback.textContent = "Acesso autorizado! Carregando painel...";
+        feedback.className = "pin-feedback success-msg";
+
+        sessionStorage.setItem("ad_crm_auth", "2014_verified");
+
+        setTimeout(() => {
+          unlockDashboard(true);
+        }, 350);
+      } else {
+        for (let i = 0; i < 4; i++) {
+          const dot = document.getElementById(`dot-${i}`);
+          if (dot) dot.className = "pin-dot error";
+        }
+        const dotsBox = document.getElementById("pin-dots");
+        dotsBox.classList.add("shake");
+
+        const feedback = document.getElementById("pin-feedback");
+        feedback.textContent = "Senha incorreta. Apenas a senha 2014 tem acesso.";
+        feedback.className = "pin-feedback";
+
+        setTimeout(() => {
+          dotsBox.classList.remove("shake");
+          clearPin();
+        }, 650);
+      }
+    }
+
+    function unlockDashboard(animate = true) {
+      isUnlocked = true;
+      const overlay = document.getElementById("auth-overlay");
+      const crm = document.getElementById("admin-crm-content");
+
+      if (animate) {
+        overlay.style.transition = "opacity 0.25s ease-out";
+        overlay.style.opacity = "0";
+        setTimeout(() => {
+          overlay.style.display = "none";
+          crm.style.display = "block";
+          loadLeads();
+        }, 250);
+      } else {
+        overlay.style.display = "none";
+        crm.style.display = "block";
+        loadLeads();
+      }
+    }
+
+    function lockAdmin() {
+      sessionStorage.removeItem("ad_crm_auth");
+      isUnlocked = false;
+      enteredPin = "";
+      const overlay = document.getElementById("auth-overlay");
+      const crm = document.getElementById("admin-crm-content");
+      overlay.style.opacity = "1";
+      overlay.style.display = "flex";
+      crm.style.display = "none";
+      clearPin();
+    }
+
+    // Suporte ao teclado físico se o usuário estiver no computador
+    document.addEventListener("keydown", (e) => {
+      if (isUnlocked) return;
+      if (e.key >= '0' && e.key <= '9') {
+        pressDigit(e.key);
+      } else if (e.key === 'Backspace') {
+        backspacePin();
+      } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
+        clearPin();
+      } else if (e.key === 'Enter') {
+        if (enteredPin.length === 4) verifyPin();
+      }
     });
 
     /**
