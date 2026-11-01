@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo de Leads | Alcântara &amp; Diamantino Consultoria Jurídica</title>
+  <link rel="icon" type="image/png" href="assets/logo-emblem.png">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Estilos Específicos do Painel Administrativo */
+    .admin-body {
+      background: #080808;
+      color: #F5F2EB;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    .admin-header {
+      background: #0D0D0D;
+      border-bottom: 1px solid rgba(198, 161, 91, 0.2);
+      padding: 18px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .admin-badge {
+      background: rgba(198, 161, 91, 0.15);
+      border: 1px solid rgba(198, 161, 91, 0.35);
+      color: #E6D2A4;
+      font-size: 0.6875rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    .admin-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-site-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      background: #141414;
+      border: 1px solid rgba(198, 161, 91, 0.2);
+      color: #E6D2A4;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      transition: var(--transition-fast);
+    }
+
+    .btn-site-link:hover {
+      background: #1F1F1F;
+      border-color: #C6A15B;
+    }
+
+    /* Métricas do Topo */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin: 32px 0 24px;
+    }
+
+    .metric-card {
+      background: #111111;
+      border: 1px solid rgba(198, 161, 91, 0.2);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .metric-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #A3A3A3;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .metric-value {
+      font-family: var(--font-serif);
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: #E6D2A4;
+      line-height: 1;
+    }
+
+    .metric-badge {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #C6A15B;
+    }
+
+    .metric-badge.green { background: #22C55E; box-shadow: 0 0 8px #22C55E; }
+
+    /* Controles e Filtros */
+    .controls-bar {
+      background: #111111;
+      border: 1px solid rgba(198, 161, 91, 0.15);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #080808;
+      border: 1px solid rgba(198, 161, 91, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      min-width: 260px;
+      flex-grow: 1;
+      max-width: 400px;
+    }
+
+    .search-input-wrap input {
+      background: transparent;
+      border: none;
+      color: #F5F2EB;
+      font-size: 0.875rem;
+      width: 100%;
+      outline: none;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-filter {
+      padding: 7px 14px;
+      border-radius: var(--radius-pill);
+      background: #181818;
+      border: 1px solid rgba(198, 161, 91, 0.15);
+      color: #A3A3A3;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .btn-filter.active, .btn-filter:hover {
+      background: rgba(198, 161, 91, 0.2);
+      color: #E6D2A4;
+      border-color: #C6A15B;
+    }
+
+    .btn-export {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(198, 161, 91, 0.15);
+      border: 1px solid #C6A15B;
+      color: #F5F2EB;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .btn-export:hover {
+      background: #C6A15B;
+      color: #080808;
+    }
+
+    /* Tabela de Leads */
+    .leads-table-container {
+      background: #111111;
+      border: 1px solid rgba(198, 161, 91, 0.2);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .leads-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    .leads-table th {
+      background: #141414;
+      padding: 14px 18px;
+      font-size: 0.6875rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: #C6A15B;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(198, 161, 91, 0.2);
+    }
+
+    .leads-table td {
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+    }
+
+    .leads-table tr:hover {
+      background: rgba(198, 161, 91, 0.04);
+    }
+
+    .lead-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lead-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #242018 0%, #111111 100%);
+      border: 1px solid #C6A15B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.8125rem;
+      color: #E6D2A4;
+    }
+
+    .lead-meta-name strong {
+      display: block;
+      color: #F5F2EB;
+      font-size: 0.9375rem;
+    }
+
+    .lead-meta-name span {
+      font-size: 0.6875rem;
+      color: #A3A3A3;
+    }
+
+    .phone-tag {
+      font-weight: 700;
+      color: #F5F2EB;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .copy-phone-btn {
+      background: transparent;
+      border: none;
+      color: #C6A15B;
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .copy-phone-btn:hover {
+      background: rgba(198, 161, 91, 0.15);
+    }
+
+    /* Botão WhatsApp de Alta Conversão no Painel */
+    .btn-action-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(180deg, #2ED868 0%, #178B3F 100%);
+      color: #FFFFFF;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-action-whatsapp:hover {
+      background: linear-gradient(180deg, #38E374 0%, #1DA74C 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 211, 102, 0.45);
+    }
+
+    /* Status Select */
+    .status-select {
+      background: #080808;
+      border: 1px solid rgba(198, 161, 91, 0.25);
+      color: #E6D2A4;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn-delete-lead {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #EF4444;
+      cursor: pointer;
+      padding: 6px 11px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      transition: var(--transition-fast);
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .btn-delete-lead:hover {
+      color: #FFFFFF;
+      background: #EF4444;
+      border-color: #EF4444;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+    }
+
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: #A3A3A3;
+    }
+
+    /* Linha clicável do Lead */
+    .lead-clickable-row {
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .lead-clickable-row:hover {
+      background: rgba(198, 161, 91, 0.08) !important;
+    }
+
+    /* Chip de Telefone/WhatsApp Clicável */
+    .phone-call-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(37, 211, 102, 0.12);
+      border: 1px solid rgba(37, 211, 102, 0.4);
+      color: #25D366;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: inherit;
+      text-decoration: none;
+    }
+
+    .phone-call-chip:hover {
+      background: #25D366;
+      color: #050505;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .phone-call-chip svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .phone-chip-badge {
+      background: rgba(37, 211, 102, 0.25);
+      color: currentColor;
+      font-size: 0.6875rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .phone-call-chip:hover .phone-chip-badge {
+      background: #050505;
+      color: #25D366;
+    }
+
+    /* Modal de Confirmação de Chamada WhatsApp */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 16px;
+      animation: fadeInModal 0.2s ease-out;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    @keyframes fadeInModal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-call-card {
+      background: #111111;
+      border: 1px solid rgba(198, 161, 91, 0.35);
+      border-radius: var(--radius-md);
+      max-width: 480px;
+      width: 100%;
+      padding: 26px 22px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(198, 161, 91, 0.15);
+      position: relative;
+      animation: scaleInModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes scaleInModal {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: #888888;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-fast);
+    }
+
+    .modal-close-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-call-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .modal-call-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid rgba(37, 211, 102, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #25D366;
+      flex-shrink: 0;
+    }
+
+    .modal-call-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.3;
+    }
+
+    .modal-call-subtitle {
+      font-size: 0.8125rem;
+      color: #A3A3A3;
+      margin-top: 2px;
+    }
+
+    .modal-lead-details {
+      background: #080808;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.875rem;
+    }
+
+    .modal-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-detail-label {
+      color: #888888;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .modal-detail-value {
+      color: #F5F5F5;
+      font-weight: 600;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    .modal-detail-value.gold {
+      color: #E6D2A4;
+      font-size: 1rem;
+    }
+
+    .modal-message-box {
+      background: rgba(37, 211, 102, 0.06);
+      border-left: 3px solid #25D366;
+      padding: 12px 14px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 22px;
+      font-size: 0.8125rem;
+      color: #D1D5DB;
+      line-height: 1.5;
+    }
+
+    .modal-message-box strong {
+      color: #25D366;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .modal-call-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-confirm-call {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 18px;
+      min-height: 48px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(180deg, #2ED868 0%, #178B3F 100%);
+      color: #FFFFFF;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition-fast);
+      font-family: inherit;
+    }
+
+    .btn-confirm-call:hover {
+      background: linear-gradient(180deg, #38E374 0%, #1DA74C 100%);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .btn-cancel-modal {
+      padding: 14px 18px;
+      min-height: 48px;
+      border-radius: var(--radius-sm);
+      background: #1A1A1A;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #A3A3A3;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      font-family: inherit;
+    }
+
+    .btn-cancel-modal:hover {
+      background: #252525;
+      color: #FFFFFF;
+    }
+
+    .btn-delete-modal {
+      padding: 14px 16px;
+      min-height: 48px;
+      border-radius: var(--radius-sm);
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #EF4444;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition-fast);
+      font-family: inherit;
+    }
+
+    .btn-delete-modal:hover {
+      background: #EF4444;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+    }
+
+    .btn-clear-test-leads {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #EF4444;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: var(--transition-fast);
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .btn-clear-test-leads:hover {
+      background: #EF4444;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Estilos do Acesso / Tela de Bloqueio (PIN 2014) */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: radial-gradient(circle at 50% 25%, #1C1812 0%, #060606 80%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+
+    .auth-card {
+      background: #0E0E0E;
+      border: 1px solid rgba(198, 161, 91, 0.35);
+      border-radius: 24px;
+      max-width: 380px;
+      width: 100%;
+      padding: 36px 26px 28px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(198, 161, 91, 0.15);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeInAuth 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeInAuth {
+      from { opacity: 0; transform: scale(0.94); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .auth-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      margin-bottom: 16px;
+    }
+
+    .auth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(198, 161, 91, 0.12);
+      border: 1px solid rgba(198, 161, 91, 0.35);
+      color: #E6D2A4;
+      font-size: 0.6875rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    .auth-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .auth-subtitle {
+      font-size: 0.8125rem;
+      color: #A3A3A3;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      min-height: 24px;
+      align-items: center;
+    }
+
+    .pin-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(198, 161, 91, 0.4);
+      background: transparent;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .pin-dot.filled {
+      background: linear-gradient(135deg, #F5E6C8 0%, #C6A15B 100%);
+      border-color: #E6D2A4;
+      box-shadow: 0 0 14px rgba(198, 161, 91, 0.8);
+      transform: scale(1.15);
+    }
+
+    .pin-dot.error {
+      background: #EF4444;
+      border-color: #EF4444;
+      box-shadow: 0 0 14px rgba(239, 68, 68, 0.8);
+    }
+
+    .pin-dot.success {
+      background: #22C55E;
+      border-color: #22C55E;
+      box-shadow: 0 0 14px rgba(34, 197, 94, 0.8);
+    }
+
+    .pin-feedback {
+      min-height: 20px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #EF4444;
+      margin-bottom: 18px;
+      transition: all 0.2s;
+    }
+
+    .pin-feedback.success-msg {
+      color: #22C55E;
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 290px;
+      margin: 0 auto 14px;
+    }
+
+    .key-btn {
+      height: 58px;
+      background: #141414;
+      border: 1px solid rgba(198, 161, 91, 0.22);
+      border-radius: 16px;
+      color: #F5F2EB;
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      font-family: inherit;
+    }
+
+    .key-btn:hover {
+      background: rgba(198, 161, 91, 0.15);
+      border-color: #C6A15B;
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
+    .key-btn:active {
+      transform: scale(0.92);
+      background: #C6A15B;
+      color: #080808;
+    }
+
+    .key-action {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #A3A3A3;
+      background: #101010;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .key-action:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #EF4444;
+    }
+
+    .btn-lock-screen {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(198, 161, 91, 0.3);
+      color: #E6D2A4;
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      font-family: inherit;
+    }
+
+    .btn-lock-screen:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: #EF4444;
+      color: #EF4444;
+    }
+
+    @keyframes shakePin {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .shake {
+      animation: shakePin 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- Tela de Bloqueio com Teclado Numérico (Senha: 2014) -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-card">
+      <img src="assets/logo.png" onerror="this.src='../assets/logo.png'" alt="Alcântara & Diamantino Advocacia" class="auth-logo">
+      <span class="auth-badge">CRM &bull; ACESSO RESTRITO</span>
+      <h1 class="auth-title">Painel Administrativo</h1>
+      <p class="auth-subtitle">Selecione os números abaixo para inserir sua senha de acesso</p>
+
+      <div class="pin-dots" id="pin-dots">
+        <span class="pin-dot" id="dot-0"></span>
+        <span class="pin-dot" id="dot-1"></span>
+        <span class="pin-dot" id="dot-2"></span>
+        <span class="pin-dot" id="dot-3"></span>
+      </div>
+
+      <div class="pin-feedback" id="pin-feedback"></div>
+
+      <!-- Teclado Numérico na tela para não abrir o teclado do celular -->
+      <div class="keypad-grid">
+        <button type="button" class="key-btn" onclick="pressDigit('1')">1</button>
+        <button type="button" class="key-btn" onclick="pressDigit('2')">2</button>
+        <button type="button" class="key-btn" onclick="pressDigit('3')">3</button>
+        <button type="button" class="key-btn" onclick="pressDigit('4')">4</button>
+        <button type="button" class="key-btn" onclick="pressDigit('5')">5</button>
+        <button type="button" class="key-btn" onclick="pressDigit('6')">6</button>
+        <button type="button" class="key-btn" onclick="pressDigit('7')">7</button>
+        <button type="button" class="key-btn" onclick="pressDigit('8')">8</button>
+        <button type="button" class="key-btn" onclick="pressDigit('9')">9</button>
+        <button type="button" class="key-btn key-action" onclick="clearPin()" title="Limpar dígitos digitados">
+          <span>Limpar</span>
+        </button>
+        <button type="button" class="key-btn" onclick="pressDigit('0')">0</button>
+        <button type="button" class="key-btn key-action" onclick="backspacePin()" title="Apagar último dígito">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+            <line x1="18" y1="9" x2="12" y2="15"></line>
+            <line x1="12" y1="9" x2="18" y2="15"></line>
+          </svg>
+        </button>
+      </div>
+
+      <p style="font-size: 0.6875rem; color: #666666; margin-top: 10px;">
+        🔒 Sistema protegido &bull; Alcântara &amp; Diamantino Advocacia
+      </p>
+    </div>
+  </div>
+
+  <div id="admin-crm-content" style="display: none;">
+    <!-- Top Header -->
+    <header class="admin-header">
+      <div class="container admin-nav-container">
+        <div class="admin-brand">
+          <a href="index.html" style="display: flex; align-items: center; text-decoration: none;">
+            <img src="assets/logo.png" onerror="this.src='../assets/logo.png'" alt="Alcântara & Diamantino Consultoria Jurídica" style="height: 42px; width: auto; object-fit: contain;">
+          </a>
+          <span class="admin-badge">CRM &bull; PAINEL DE LEADS</span>
+        </div>
+
+        <div class="admin-actions">
+          <span class="gold-pulse" title="Sincronização Ativa"></span>
+          <span style="font-size: 0.75rem; color: #22C55E; font-weight: 700; margin-right: 12px;">Ao Vivo</span>
+          <a href="index.html" class="btn-site-link" target="_blank">
+            <span>Ver Landing Page</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+          <button type="button" class="btn-lock-screen" onclick="lockAdmin()" title="Bloquear e Sair do Painel">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Sair</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+  <main class="container">
+    
+    <!-- Linha de Métricas Rápidas -->
+    <section class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-badge green"></div>
+        <span class="metric-title">Total de Contatos</span>
+        <span class="metric-value" id="stat-total">0</span>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-badge" style="background: #F59E0B; box-shadow: 0 0 8px #F59E0B;"></div>
+        <span class="metric-title">Novos (Aguardando Atendimento)</span>
+        <span class="metric-value" id="stat-novos">0</span>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-badge" style="background: #3B82F6;"></div>
+        <span class="metric-title">Em Atendimento</span>
+        <span class="metric-value" id="stat-andamento">0</span>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-badge" style="background: #10B981;"></div>
+        <span class="metric-title">Concluídos / Fechados</span>
+        <span class="metric-value" id="stat-concluidos">0</span>
+      </div>
+    </section>
+
+    <!-- Barra de Controles e Filtros -->
+    <section class="controls-bar">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#C6A15B" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search-box" placeholder="Buscar por nome ou telefone..." oninput="handleSearch()">
+      </div>
+
+      <div class="filter-group">
+        <button class="btn-filter active" onclick="setFilter('todos', this)">Todos</button>
+        <button class="btn-filter" onclick="setFilter('novo', this)">Novos</button>
+        <button class="btn-filter" onclick="setFilter('em_atendimento', this)">Em Atendimento</button>
+        <button class="btn-filter" onclick="setFilter('concluido', this)">Concluídos</button>
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <button class="btn-export" onclick="exportToCSV()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          <span>Exportar Planilha (CSV)</span>
+        </button>
+
+        <button class="btn-clear-test-leads" onclick="cleanTestLeads()" title="Excluir contatos de teste cadastrados">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Limpar Testes</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Tabela de Leads Recebidos -->
+    <section class="leads-table-container">
+      <table class="leads-table">
+        <thead>
+          <tr>
+            <th>Data / Hora</th>
+            <th>Nome do Trabalhador</th>
+            <th>Telefone / WhatsApp</th>
+            <th>Assunto Relatado</th>
+            <th>Origem</th>
+            <th>Status</th>
+            <th>Ação Imediata</th>
+            <th style="text-align: center;">Excluir</th>
+          </tr>
+        </thead>
+        <tbody id="leads-table-body">
+          <!-- Injetado dinamicamente via JS -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Modal de Confirmação para Chamar no WhatsApp -->
+    <div id="call-modal" class="modal-overlay" onclick="handleModalOverlayClick(event)">
+      <div class="modal-call-card" onclick="event.stopPropagation()">
+        <button class="modal-close-btn" onclick="closeCallModal()" title="Fechar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <div class="modal-call-header">
+          <div class="modal-call-icon">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="modal-call-title">Chamar no WhatsApp</div>
+            <div class="modal-call-subtitle">Deseja iniciar atendimento comercial com este contato?</div>
+          </div>
+        </div>
+
+        <div class="modal-lead-details">
+          <div class="modal-detail-row">
+            <span class="modal-detail-label">Contato:</span>
+            <span class="modal-detail-value" id="modal-lead-name">-</span>
+          </div>
+          <div class="modal-detail-row">
+            <span class="modal-detail-label">Telefone:</span>
+            <span class="modal-detail-value gold" id="modal-lead-phone">-</span>
+          </div>
+          <div class="modal-detail-row">
+            <span class="modal-detail-label">Assunto:</span>
+            <span class="modal-detail-value" id="modal-lead-subject">-</span>
+          </div>
+          <div class="modal-detail-row">
+            <span class="modal-detail-label">Origem:</span>
+            <span class="modal-detail-value" id="modal-lead-origin">-</span>
+          </div>
+          <div class="modal-detail-row">
+            <span class="modal-detail-label">Data / Hora:</span>
+            <span class="modal-detail-value" id="modal-lead-date">-</span>
+          </div>
+        </div>
+
+        <div class="modal-message-box">
+          <strong>Mensagem inicial pronta para envio:</strong>
+          <p id="modal-lead-preview" style="margin: 0; font-style: italic;">Carregando...</p>
+        </div>
+
+        <div class="modal-call-actions">
+          <button type="button" class="btn-delete-modal" onclick="deleteCurrentModalLead()" title="Excluir este contato do painel">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Excluir</span>
+          </button>
+          <button type="button" class="btn-cancel-modal" onclick="closeCallModal()">Fechar</button>
+          <button type="button" class="btn-confirm-call" id="modal-btn-confirm" onclick="confirmCallModal()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+            </svg>
+            <span>Sim, Chamar no WhatsApp</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+  </div> <!-- Fim #admin-crm-content -->
+
+  <script>
+    const CORRECT_PIN = "2014";
+    let enteredPin = "";
+    let isUnlocked = false;
+    let allLeads = [];
+    let currentFilter = 'todos';
+    let currentModalLead = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkExistingAuth();
+      // Auto-refresh a cada 8 segundos para sincronizar contatos em tempo real (apenas se desbloqueado)
+      setInterval(() => {
+        if (isUnlocked) loadLeads();
+      }, 8000);
+    });
+
+    function checkExistingAuth() {
+      const savedAuth = sessionStorage.getItem("ad_crm_auth");
+      if (savedAuth === "2014_verified") {
+        unlockDashboard(false);
+      } else {
+        document.getElementById("auth-overlay").style.display = "flex";
+        document.getElementById("admin-crm-content").style.display = "none";
+      }
+    }
+
+    function updateDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (!dot) continue;
+        dot.className = "pin-dot" + (i < enteredPin.length ? " filled" : "");
+      }
+      const feedback = document.getElementById("pin-feedback");
+      if (feedback) {
+        feedback.textContent = "";
+        feedback.className = "pin-feedback";
+      }
+    }
+
+    function pressDigit(digit) {
+      if (enteredPin.length >= 4) return;
+      enteredPin += String(digit);
+      updateDots();
+
+      if (enteredPin.length === 4) {
+        verifyPin();
+      }
+    }
+
+    function backspacePin() {
+      if (enteredPin.length > 0) {
+        enteredPin = enteredPin.slice(0, -1);
+        updateDots();
+      }
+    }
+
+    function clearPin() {
+      enteredPin = "";
+      updateDots();
+    }
+
+    function verifyPin() {
+      if (enteredPin === CORRECT_PIN) {
+        for (let i = 0; i < 4; i++) {
+          const dot = document.getElementById(`dot-${i}`);
+          if (dot) dot.className = "pin-dot success";
+        }
+        const feedback = document.getElementById("pin-feedback");
+        feedback.textContent = "Acesso autorizado! Carregando painel...";
+        feedback.className = "pin-feedback success-msg";
+
+        sessionStorage.setItem("ad_crm_auth", "2014_verified");
+
+        setTimeout(() => {
+          unlockDashboard(true);
+        }, 350);
+      } else {
+        for (let i = 0; i < 4; i++) {
+          const dot = document.getElementById(`dot-${i}`);
+          if (dot) dot.className = "pin-dot error";
+        }
+        const dotsBox = document.getElementById("pin-dots");
+        dotsBox.classList.add("shake");
+
+        const feedback = document.getElementById("pin-feedback");
+        feedback.textContent = "Senha incorreta. Apenas a senha 2014 tem acesso.";
+        feedback.className = "pin-feedback";
+
+        setTimeout(() => {
+          dotsBox.classList.remove("shake");
+          clearPin();
+        }, 650);
+      }
+    }
+
+    function unlockDashboard(animate = true) {
+      isUnlocked = true;
+      const overlay = document.getElementById("auth-overlay");
+      const crm = document.getElementById("admin-crm-content");
+
+      if (animate) {
+        overlay.style.transition = "opacity 0.25s ease-out";
+        overlay.style.opacity = "0";
+        setTimeout(() => {
+          overlay.style.display = "none";
+          crm.style.display = "block";
+          loadLeads();
+        }, 250);
+      } else {
+        overlay.style.display = "none";
+        crm.style.display = "block";
+        loadLeads();
+      }
+    }
+
+    function lockAdmin() {
+      sessionStorage.removeItem("ad_crm_auth");
+      isUnlocked = false;
+      enteredPin = "";
+      const overlay = document.getElementById("auth-overlay");
+      const crm = document.getElementById("admin-crm-content");
+      overlay.style.opacity = "1";
+      overlay.style.display = "flex";
+      crm.style.display = "none";
+      clearPin();
+    }
+
+    // Suporte ao teclado físico se o usuário estiver no computador
+    document.addEventListener("keydown", (e) => {
+      if (isUnlocked) return;
+      if (e.key >= '0' && e.key <= '9') {
+        pressDigit(e.key);
+      } else if (e.key === 'Backspace') {
+        backspacePin();
+      } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
+        clearPin();
+      } else if (e.key === 'Enter') {
+        if (enteredPin.length === 4) verifyPin();
+      }
+    });
+
+    /**
+     * Carrega os leads da API REST do servidor ou do localStorage como fallback
+     */
+    async function loadLeads() {
+      try {
+        const resp = await fetch("/api/leads");
+        if (resp.ok) {
+          allLeads = await resp.json();
+        } else {
+          fallbackLocalStorage();
+        }
+      } catch (e) {
+        fallbackLocalStorage();
+      }
+
+      renderLeads();
+      updateStats();
+    }
+
+    function fallbackLocalStorage() {
+      const stored = localStorage.getItem("landing_advocacia_leads");
+      if (stored) {
+        try {
+          allLeads = JSON.parse(stored);
+        } catch (e) {
+          allLeads = [];
+        }
+      }
+    }
+
+    function updateStats() {
+      const total = allLeads.length;
+      const novos = allLeads.filter(l => l.status === 'novo').length;
+      const andamento = allLeads.filter(l => l.status === 'em_atendimento').length;
+      const concluidos = allLeads.filter(l => l.status === 'concluido').length;
+
+      document.getElementById("stat-total").textContent = total;
+      document.getElementById("stat-novos").textContent = novos;
+      document.getElementById("stat-andamento").textContent = andamento;
+      document.getElementById("stat-concluidos").textContent = concluidos;
+    }
+
+    function renderLeads() {
+      const tbody = document.getElementById("leads-table-body");
+      const searchVal = document.getElementById("search-box").value.toLowerCase().trim();
+
+      let filtered = allLeads;
+
+      if (currentFilter !== 'todos') {
+        filtered = filtered.filter(l => l.status === currentFilter);
+      }
+
+      if (searchVal) {
+        filtered = filtered.filter(l => 
+          (l.nome && l.nome.toLowerCase().includes(searchVal)) ||
+          (l.telefone && l.telefone.includes(searchVal)) ||
+          (l.assunto && l.assunto.toLowerCase().includes(searchVal))
+        );
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty-state">
+              Nenhum contato encontrado para os filtros selecionados.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(lead => {
+        const initials = (lead.nome || "C")
+          .split(" ")
+          .map(n => n[0])
+          .slice(0, 2)
+          .join("")
+          .toUpperCase();
+
+        return `
+          <tr class="lead-clickable-row" onclick="openCallModal('${lead.id}', event)" title="Clique para chamar ${lead.nome || 'o contato'} no WhatsApp">
+            <td style="color: #A3A3A3; font-size: 0.75rem;">${lead.dataHora || 'Hoje'}</td>
+            <td>
+              <div class="lead-name-cell">
+                <div class="lead-avatar">${initials}</div>
+                <div class="lead-meta-name">
+                  <strong>${lead.nome || 'Não informado'}</strong>
+                  <span>Cliente Potencial</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="phone-tag">
+                <button type="button" class="phone-call-chip" onclick="openCallModal('${lead.id}', event)" title="Chamar no WhatsApp">
+                  <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                  <span>${lead.telefone || '-'}</span>
+                  <span class="phone-chip-badge">Chamar</span>
+                </button>
+                <button class="copy-phone-btn" onclick="event.stopPropagation(); copyToClipboard('${lead.telefone}')" title="Copiar telefone">Copiar</button>
+              </div>
+            </td>
+            <td>
+              <span style="color: #E6D2A4; font-weight: 600;">${lead.assunto || 'Geral'}</span>
+            </td>
+            <td>
+              <span style="font-size: 0.75rem; color: #A3A3A3;">${lead.origem || 'Landing Page'}</span>
+            </td>
+            <td>
+              <select class="status-select" onclick="event.stopPropagation()" onchange="event.stopPropagation(); updateLeadStatus('${lead.id}', this.value)">
+                <option value="novo" ${lead.status === 'novo' ? 'selected' : ''}>🟡 Novo</option>
+                <option value="em_atendimento" ${lead.status === 'em_atendimento' ? 'selected' : ''}>🔵 Em Atendimento</option>
+                <option value="concluido" ${lead.status === 'concluido' ? 'selected' : ''}>🟢 Concluído / Fechado</option>
+              </select>
+            </td>
+            <td>
+              <button type="button" class="btn-action-whatsapp" onclick="openCallModal('${lead.id}', event)">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+                </svg>
+                <span>Chamar no WhatsApp</span>
+              </button>
+            </td>
+            <td style="text-align: center;">
+              <button class="btn-delete-lead" onclick="event.stopPropagation(); deleteLead('${lead.id}')" title="Excluir este contato">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Excluir</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    /**
+     * Exclui o contato atualmente aberto na janela modal
+     */
+    function deleteCurrentModalLead() {
+      if (!currentModalLead) return;
+      const leadId = currentModalLead.id;
+      const leadName = currentModalLead.nome || "este contato";
+
+      if (confirm(`Deseja realmente excluir "${leadName}" do painel?`)) {
+        closeCallModal();
+        deleteLead(leadId, false);
+      }
+    }
+
+    /**
+     * Limpa contatos de teste ou permite redefinir o painel com confirmação
+     */
+    function cleanTestLeads() {
+      const testLeads = allLeads.filter(l => 
+        (l.nome && /teste|test|demo|exemplo/i.test(l.nome)) ||
+        (l.assunto && /teste|test|demo|exemplo/i.test(l.assunto))
+      );
+
+      if (testLeads.length > 0) {
+        if (confirm(`Encontrado(s) ${testLeads.length} contato(s) de teste. Deseja excluir todos os testes agora?`)) {
+          testLeads.forEach(l => {
+            fetch("/api/leads/delete", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: l.id })
+            }).catch(() => {});
+          });
+          allLeads = allLeads.filter(l => !testLeads.includes(l));
+          localStorage.setItem("landing_advocacia_leads", JSON.stringify(allLeads));
+          renderLeads();
+          updateStats();
+          alert(`${testLeads.length} contato(s) de teste excluído(s) com sucesso!`);
+        }
+      } else {
+        if (confirm("Nenhum contato identificado com a palavra 'teste'. Deseja remover todos os contatos do painel para começar do zero?")) {
+          allLeads.forEach(l => {
+            fetch("/api/leads/delete", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: l.id })
+            }).catch(() => {});
+          });
+          allLeads = [];
+          localStorage.setItem("landing_advocacia_leads", JSON.stringify([]));
+          renderLeads();
+          updateStats();
+          alert("Todos os contatos foram removidos!");
+        }
+      }
+    }
+
+    /**
+     * Abre modal de confirmação para chamar no WhatsApp ao clicar na linha ou contato
+     */
+    function openCallModal(leadId, event) {
+      if (event) {
+        if (event.target.closest('.status-select') || 
+            event.target.closest('.btn-delete-lead') || 
+            event.target.closest('.copy-phone-btn')) {
+          return;
+        }
+      }
+
+      const lead = allLeads.find(l => String(l.id) === String(leadId));
+      if (!lead) return;
+
+      currentModalLead = lead;
+
+      const saudacao = `Olá, ${lead.nome || 'trabalhador(a)'}! Tudo bem? Me chamo Dr. Pedro Alcântara, da equipe Alcântara & Diamantino Advocacia. Vi que você acessou nossa página de *Direito do Trabalho* e solicitou uma avaliação sobre "${lead.assunto || 'seus direitos'}". Como podemos te ajudar hoje?`;
+
+      document.getElementById("modal-lead-name").textContent = lead.nome || "Não informado";
+      document.getElementById("modal-lead-phone").textContent = lead.telefone || "-";
+      document.getElementById("modal-lead-subject").textContent = lead.assunto || "Geral";
+      document.getElementById("modal-lead-origin").textContent = lead.origem || "Landing Page";
+      document.getElementById("modal-lead-date").textContent = lead.dataHora || "Hoje";
+      document.getElementById("modal-lead-preview").textContent = `"${saudacao}"`;
+
+      const modal = document.getElementById("call-modal");
+      modal.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeCallModal() {
+      const modal = document.getElementById("call-modal");
+      if (modal) modal.classList.remove("active");
+      document.body.style.overflow = "";
+      currentModalLead = null;
+    }
+
+    function handleModalOverlayClick(event) {
+      if (event.target.id === "call-modal") {
+        closeCallModal();
+      }
+    }
+
+    function confirmCallModal() {
+      if (!currentModalLead) return;
+
+      const lead = currentModalLead;
+      const rawPhone = (lead.telefone || "").replace(/\D/g, "");
+      const cleanPhone = rawPhone.startsWith("55") ? rawPhone : "55" + rawPhone;
+      const saudacao = `Olá, ${lead.nome || 'trabalhador(a)'}! Tudo bem? Me chamo Dr. Pedro Alcântara, da equipe Alcântara & Diamantino Advocacia. Vi que você acessou nossa página de *Direito do Trabalho* e solicitou uma avaliação sobre "${lead.assunto || 'seus direitos'}". Como podemos te ajudar hoje?`;
+      const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(saudacao)}`;
+
+      // Atualiza status automaticamente para "em_atendimento"
+      updateLeadStatus(lead.id, "em_atendimento");
+
+      // Redireciona para o WhatsApp do cliente
+      window.open(waLink, "_blank");
+
+      closeCallModal();
+    }
+
+    // Fechar modal com tecla ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeCallModal();
+      }
+    });
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll(".btn-filter").forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      renderLeads();
+    }
+
+    function handleSearch() {
+      renderLeads();
+    }
+
+    async function updateLeadStatus(id, newStatus) {
+      try {
+        await fetch("/api/leads/status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, status: newStatus })
+        });
+      } catch (e) {
+        console.log("Atualizado localmente");
+      }
+
+      const lead = allLeads.find(l => String(l.id) === String(id));
+      if (lead) lead.status = newStatus;
+      localStorage.setItem("landing_advocacia_leads", JSON.stringify(allLeads));
+      renderLeads();
+      updateStats();
+    }
+
+    function markLeadContacted(id) {
+      updateLeadStatus(id, "em_atendimento");
+    }
+
+    async function deleteLead(id, askConfirm = true) {
+      if (askConfirm && !confirm("Deseja realmente remover este contato do painel?")) return;
+
+      try {
+        await fetch("/api/leads/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id })
+        });
+      } catch (e) {
+        console.log("Removido localmente");
+      }
+
+      allLeads = allLeads.filter(l => String(l.id) !== String(id));
+      localStorage.setItem("landing_advocacia_leads", JSON.stringify(allLeads));
+      renderLeads();
+      updateStats();
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Telefone copiado para a área de transferência: " + text);
+      });
+    }
+
+    function exportToCSV() {
+      if (allLeads.length === 0) {
+        alert("Não há contatos para exportar.");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Data/Hora,Nome,Telefone,Assunto,Origem,Status\n";
+
+      allLeads.forEach(l => {
+        csvContent += `"${l.dataHora || ''}","${l.nome || ''}","${l.telefone || ''}","${l.assunto || ''}","${l.origem || ''}","${l.status || ''}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `leads_trabalhistas_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>

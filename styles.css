@@ -2370,6 +2370,70 @@ button, input, select, textarea {
 
 
 /* ==========================================================================
+   Aba Fixa & Navegação Exclusiva ADM (/soparaadm)
+   ========================================================================== */
+.floating-adm-tab {
+  position: fixed;
+  bottom: 0;
+  left: 24px;
+  z-index: 998;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: #111111;
+  border: 1px solid rgba(198, 161, 91, 0.35);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  color: #C6A15B;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.6);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.floating-adm-tab:hover {
+  background: #1A1A1A;
+  color: #E6D2A4;
+  border-color: #C6A15B;
+  transform: translateY(-3px);
+  box-shadow: 0 -6px 20px rgba(198, 161, 91, 0.25);
+}
+
+.nav-tab-adm {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  background: rgba(198, 161, 91, 0.08);
+  border: 1px solid rgba(198, 161, 91, 0.25);
+  color: #C6A15B;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin-left: 6px;
+}
+
+.nav-tab-adm:hover {
+  background: rgba(198, 161, 91, 0.18);
+  border-color: #C6A15B;
+  color: #FFFFFF;
+}
+
+@media (max-width: 768px) {
+  .floating-adm-tab {
+    left: 12px;
+    padding: 6px 12px;
+    font-size: 0.6875rem;
+  }
+}
+
+/* ==========================================================================
    Prefers Reduced Motion
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {

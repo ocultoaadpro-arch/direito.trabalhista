@@ -75,10 +75,13 @@ class CustomHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(leads, ensure_ascii=False).encode("utf-8"))
             return
 
-        # Rota de atalho para o painel admin (/admin ou /admin/)
+        # Rota de atalho para o painel admin (/soparaadm ou /admin)
         filepath = parsed.path.strip("/")
         if filepath == "":
             filepath = "index.html"
+        elif filepath in ["soparaadm", "soparaadm/index.html"]:
+            soparaadm_dir_index = os.path.join(BASE_DIR, "soparaadm", "index.html")
+            filepath = "soparaadm/index.html" if os.path.isfile(soparaadm_dir_index) else "soparaadm.html"
         elif filepath in ["admin", "admin/index.html"]:
             admin_dir_index = os.path.join(BASE_DIR, "admin", "index.html")
             filepath = "admin/index.html" if os.path.isfile(admin_dir_index) else "admin.html"
