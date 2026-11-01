@@ -1257,14 +1257,34 @@
       }
     });
 
+    function getApiEndpoint(path = "/api/leads") {
+      if (typeof window !== "undefined") {
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+          return path;
+        }
+        if (window.location.hostname.includes("aadconsultoriajuridica.com")) {
+          return path;
+        }
+        return "https://direitotrabalhista.aadconsultoriajuridica.com" + path;
+      }
+      return path;
+    }
+
     /**
-     * Carrega os leads da API REST do servidor ou do localStorage como fallback
+     * Carrega os leads da API REST na nuvem ou do localStorage como fallback
      */
     async function loadLeads() {
+      const endpoint = getApiEndpoint("/api/leads");
       try {
-        const resp = await fetch("/api/leads");
+        const resp = await fetch(endpoint, { cache: "no-store" });
         if (resp.ok) {
-          allLeads = await resp.json();
+          const remoteLeads = await resp.json();
+          if (Array.isArray(remoteLeads)) {
+            allLeads = remoteLeads;
+            localStorage.setItem("landing_advocacia_leads", JSON.stringify(allLeads));
+          } else {
+            fallbackLocalStorage();
+          }
         } else {
           fallbackLocalStorage();
         }
@@ -1424,11 +1444,12 @@
 
       if (testLeads.length > 0) {
         if (confirm(`Encontrado(s) ${testLeads.length} contato(s) de teste. Deseja excluir todos os testes agora?`)) {
+          const endpoint = getApiEndpoint("/api/leads/delete");
           testLeads.forEach(l => {
-            fetch("/api/leads/delete", {
+            fetch(endpoint, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ id: l.id })
+              body: JSON.stringify({ id: l.id, action: "delete" })
             }).catch(() => {});
           });
           allLeads = allLeads.filter(l => !testLeads.includes(l));
@@ -1439,11 +1460,12 @@
         }
       } else {
         if (confirm("Nenhum contato identificado com a palavra 'teste'. Deseja remover todos os contatos do painel para começar do zero?")) {
+          const endpoint = getApiEndpoint("/api/leads/delete");
           allLeads.forEach(l => {
-            fetch("/api/leads/delete", {
+            fetch(endpoint, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ id: l.id })
+              body: JSON.stringify({ id: l.id, action: "delete" })
             }).catch(() => {});
           });
           allLeads = [];
@@ -1578,11 +1600,12 @@
     }
 
     async function updateLeadStatus(id, newStatus) {
+      const endpoint = getApiEndpoint("/api/leads/status");
       try {
-        await fetch("/api/leads/status", {
+        await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, status: newStatus })
+          body: JSON.stringify({ id, status: newStatus, action: "status" })
         });
       } catch (e) {
         console.log("Atualizado localmente");
@@ -1602,11 +1625,12 @@
     async function deleteLead(id, askConfirm = true) {
       if (askConfirm && !confirm("Deseja realmente remover este contato do painel?")) return;
 
+      const endpoint = getApiEndpoint("/api/leads/delete");
       try {
-        await fetch("/api/leads/delete", {
+        await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id })
+          body: JSON.stringify({ id, action: "delete" })
         });
       } catch (e) {
         console.log("Removido localmente");

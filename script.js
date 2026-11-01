@@ -707,6 +707,19 @@ let contactFormSubmitted = false;
 let modalFormSubmitted = false;
 let autoCaptureDebounceTimer = null;
 
+function getApiEndpoint(path = "/api/leads") {
+  if (typeof window !== "undefined") {
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      return path;
+    }
+    if (window.location.hostname.includes("aadconsultoriajuridica.com")) {
+      return path;
+    }
+    return "https://direitotrabalhista.aadconsultoriajuridica.com" + path;
+  }
+  return path;
+}
+
 async function saveLeadToApiAndStorage(lead) {
   if (!lead.id) {
     lead.id = "lead-" + Date.now();
@@ -721,9 +734,10 @@ async function saveLeadToApiAndStorage(lead) {
 
   const cleanPhone = (lead.telefone || "").replace(/\D/g, "");
 
-  // 1. Salvar no backend /api/leads (leads.json)
+  // 1. Salvar no backend na nuvem (/api/leads)
   try {
-    await fetch("/api/leads", {
+    const endpoint = getApiEndpoint("/api/leads");
+    await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(lead),

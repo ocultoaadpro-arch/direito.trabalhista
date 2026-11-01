@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/leads/status", "destination": "/api/leads/status.js" },
+    { "source": "/api/leads/delete", "destination": "/api/leads/delete.js" },
+    { "source": "/api/leads", "destination": "/api/leads.js" },
+    { "source": "/soparaadm", "destination": "/soparaadm/index.html" },
+    { "source": "/soparaadm/", "destination": "/soparaadm/index.html" },
+    { "source": "/admin", "destination": "/soparaadm/index.html" },
+    { "source": "/admin/", "destination": "/soparaadm/index.html" }
+  ]
+}
